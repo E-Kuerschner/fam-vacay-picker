@@ -6,6 +6,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { ThemeProvider, MediaQueryProvider } from '@coinbase/cds-web/system';
+import { defaultTheme } from '@coinbase/cds-web/themes/defaultTheme';
+
+// CDS imports for client entry point
+import '@coinbase/cds-icons/fonts/web/icon-font.css';
+import '@coinbase/cds-web/globalStyles';
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -33,9 +39,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+      <MediaQueryProvider>
+        <ThemeProvider theme={defaultTheme} activeColorScheme="light">
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </ThemeProvider>
+      </MediaQueryProvider>
       </body>
     </html>
   );
@@ -62,11 +72,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="error-container">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
+        <pre className="error-stack">
           <code>{stack}</code>
         </pre>
       )}
