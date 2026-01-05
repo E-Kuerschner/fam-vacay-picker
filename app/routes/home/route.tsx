@@ -1,5 +1,5 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import type { Route} from "./+types/route";
+import { Welcome } from "./welcome";
 import { getSession } from "~/auth/auth.server";
 
 export function meta({}: Route.MetaArgs) {

@@ -18,7 +18,7 @@ React Router generates types for its loaders, actions and other framework-level 
 Import loader and action types from the route's corresponding type module:
 ```ts
 // app/routes/home/route.tsx
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/route";
 
 // then in the loader
 export function loader({ params }: Route.LoaderArgs) {
