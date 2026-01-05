@@ -7,7 +7,7 @@
 		"cf-typegen": "wrangler types",
 		"dev": "react-router dev",
 		"preview": "bun build && vite preview",
-		"deploy": "bun build && wrangler deploy",
+		"deploy": "bun run build && wrangler deploy",
 		"postinstall": "bun cf-typegen",
 		"typecheck": "bun cf-typegen && react-router typegen && tsc -b",
 		"db:generate": "bun x @better-auth/cli generate --yes --output ./database/authSchema.ts && bun --bun --env-file=.dev.vars drizzle-kit --config database/drizzle.config.ts generate",
