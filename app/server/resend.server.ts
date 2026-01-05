@@ -43,7 +43,8 @@ export function createEmailSender(resend: ResendClient) {
     }
 
     await resend.emails.send({
-      from: "Fam Vacay Picker <noreply@mail.yourdomain.com>",
+      // TODO need to use a different domain for sending emails - using only registered one with Resend for now
+      from: "Fam Vacay Picker <noreply@erichandliz.love>",
       to,
       subject,
       html,
