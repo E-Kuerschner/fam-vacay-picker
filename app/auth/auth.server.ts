@@ -1,36 +1,23 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
-import { Resend } from "resend";
+import {
+  createResendClient,
+  createEmailSender,
+  type ResendClient,
+} from "~/server/resend.server";
 import { createAuthOptions } from "./options";
 
 type CreateAuthParams = {
   db: D1Database;
   secret: string;
   baseURL: string;
-  resendApiKey: string;
+  resend: ResendClient;
 };
 
-export function createAuth({ db, secret, baseURL, resendApiKey }: CreateAuthParams) {
+export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
   const drizzleDb = drizzle(db);
-  const resend = new Resend(resendApiKey);
-
-  const sendEmail = async ({
-    to,
-    subject,
-    html,
-  }: {
-    to: string;
-    subject: string;
-    html: string;
-  }) => {
-    await resend.emails.send({
-      from: "Fam Vacay Picker <noreply@mail.yourdomain.com>",
-      to,
-      subject,
-      html,
-    });
-  };
+  const sendEmail = createEmailSender(resend);
 
   const options = createAuthOptions({ secret, baseURL, sendEmail });
 
@@ -49,11 +36,13 @@ export type Auth = ReturnType<typeof createAuth>;
  * Use in loaders/actions to get the auth instance.
  */
 export function getAuthFromEnv(env: Env) {
+  const resend = createResendClient({ apiKey: env.RESEND_API_KEY });
+
   return createAuth({
     db: env.DB,
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
-    resendApiKey: env.RESEND_API_KEY,
+    resend,
   });
 }
 
