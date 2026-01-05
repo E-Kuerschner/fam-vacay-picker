@@ -12,6 +12,7 @@ import {
   userAdditionalFields,
   sessionAdditionalFields,
 } from "../../database/auth.config";
+import * as schema from "../../database/schema";
 
 type CreateAuthParams = {
   db: D1Database;
@@ -54,6 +55,7 @@ export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
     ...options,
     database: drizzleAdapter(drizzleDb, {
       provider: "sqlite",
+      schema,
     }),
   });
 }
