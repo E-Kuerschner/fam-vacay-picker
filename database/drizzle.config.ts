@@ -1,0 +1,13 @@
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./database/schema.ts",
+  out: "./database/migrations",
+  dialect: "sqlite",
+  driver: "d1-http",
+  dbCredentials: {
+    accountId: Bun.env.CLOUDFLARE_ACCOUNT_ID!,
+    databaseId: Bun.env.CLOUDFLARE_DATABASE_ID!,
+    token: Bun.env.CLOUDFLARE_API_TOKEN!,
+  },
+});
