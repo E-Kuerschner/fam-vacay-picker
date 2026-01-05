@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
 import {
@@ -6,7 +6,12 @@ import {
   createEmailSender,
   type ResendClient,
 } from "~/server/resend.server";
-import { createAuthOptions } from "./options";
+
+import {
+  createPlugins,
+  userAdditionalFields,
+  sessionAdditionalFields,
+} from "../../database/auth.config";
 
 type CreateAuthParams = {
   db: D1Database;
@@ -19,7 +24,31 @@ export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
   const drizzleDb = drizzle(db);
   const sendEmail = createEmailSender(resend);
 
-  const options = createAuthOptions({ secret, baseURL, sendEmail });
+  const options = {
+    secret,
+    baseURL,
+    plugins: createPlugins({
+      sendMagicLink: async ({ email, url }) => {
+        await sendEmail({
+          to: email,
+          subject: "Sign in to Fam Vacay Picker",
+          html: `
+            <h1>Sign in to Fam Vacay Picker</h1>
+            <p>Click the link below to sign in:</p>
+            <a href="${url}">Sign in</a>
+            <p>This link will expire in 5 minutes.</p>
+            <p>If you didn't request this email, you can safely ignore it.</p>
+          `,
+        });
+      },
+    }),
+    user: {
+      additionalFields: userAdditionalFields,
+    },
+    session: {
+      additionalFields: sessionAdditionalFields,
+    },
+  };
 
   return betterAuth({
     ...options,

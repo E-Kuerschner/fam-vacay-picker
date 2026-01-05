@@ -8,7 +8,7 @@
  *
  * Used by both:
  * - auth.ts (CLI stub for schema generation)
- * - app/auth/options.ts (runtime config)
+ * - app/auth/auth.server.ts (runtime config)
  */
 import { magicLink, admin } from "better-auth/plugins";
 
