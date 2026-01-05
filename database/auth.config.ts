@@ -26,6 +26,7 @@ export function createPlugins({ sendMagicLink }: CreatePluginsParams = {}) {
   return [
     magicLink({
       sendMagicLink: sendMagicLink ?? (async () => {}),
+      disableSignUp: true,
     }),
     admin(),
   ];

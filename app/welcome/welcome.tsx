@@ -1,11 +1,42 @@
 import { Button } from '@coinbase/cds-web/buttons';
+import { VStack } from '@coinbase/cds-web/layout';
+import { Link } from 'react-router';
+import { signOut } from '~/auth/auth.client';
 
-export function Welcome({ message }: { message: string }) {
+type Session = {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+} | null;
+
+export function Welcome({ message, session }: { message: string; session: Session }) {
+  async function handleSignOut() {
+    await signOut();
+    window.location.reload();
+  }
+
   return (
     <main>
-      <h1>Welcome</h1>
-      <p>{message}</p>
-      <Button onClick={() => alert("clicked")}>Click Me</Button>
+      <VStack gap={4}>
+        <h1>Welcome</h1>
+        <p>{message}</p>
+        {session ? (
+          <VStack gap={2}>
+            <p>Signed in as: <strong>{session.user.email}</strong></p>
+            {session.user.name && <p>Name: {session.user.name}</p>}
+            <Button onClick={handleSignOut}>Sign Out</Button>
+          </VStack>
+        ) : (
+          <VStack gap={2}>
+            <p>You are not signed in.</p>
+            <Link to="/login">
+              <Button>Sign In</Button>
+            </Link>
+          </VStack>
+        )}
+      </VStack>
     </main>
   );
 }

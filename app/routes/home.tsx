@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Welcome } from "../welcome/welcome";
+import { getSession } from "~/auth/auth.server";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,10 +9,14 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export function loader({}: Route.LoaderArgs) {
-  return { message: "Welcome to Fam Vacay Picker!" };
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const session = await getSession(request, context.cloudflare.env);
+  return {
+    message: "Welcome to Fam Vacay Picker!",
+    session,
+  };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Welcome message={loaderData.message} />;
+  return <Welcome message={loaderData.message} session={loaderData.session} />;
 }

@@ -75,6 +75,8 @@ For complex animations or for spring animations, use `framer-motion`; docs: http
 
 ## Development Notes
 - Ask clarifying questions when working on a complex task
+- Use React Router's `Form` component for submiting actions
+- Use Coinbase Design Systems' `Box`, `VStack`, `HStack` instead of divs for containers
 - Always follow React Router (in Framework mode) best practices
 - Use Bun as the package manager and runtime for all scripts
 - Cloudflare types are auto-generated via `wrangler types` on postinstall

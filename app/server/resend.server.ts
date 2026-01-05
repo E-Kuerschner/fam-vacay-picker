@@ -32,6 +32,16 @@ type SendEmailParams = {
  */
 export function createEmailSender(resend: ResendClient) {
   return async ({ to, subject, html }: SendEmailParams) => {
+    if (import.meta.env.DEV) {
+      console.log("=".repeat(60));
+      console.log("[DEV] Email would be sent:");
+      console.log(`  To: ${to}`);
+      console.log(`  Subject: ${subject}`);
+      console.log(`  HTML:\n${html}`);
+      console.log("=".repeat(60));
+      return;
+    }
+
     await resend.emails.send({
       from: "Fam Vacay Picker <noreply@mail.yourdomain.com>",
       to,
