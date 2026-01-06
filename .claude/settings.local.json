@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "mcp__better-auth__search"
+      "mcp__better-auth__search",
+      "mcp__jetbrains__get_file_text_by_path",
+      "Bash(mkdir:*)",
+      "mcp__jetbrains__find_files_by_name_keyword",
+      "WebFetch(domain:cds.coinbase.com)",
+      "Bash(bun run typecheck:*)",
+      "WebSearch"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "cds"
+  ],
+  "enableAllProjectMcpServers": true
 }

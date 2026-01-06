@@ -32,9 +32,11 @@ export function loader({ params }: Route.LoaderArgs) {
 
 We use CDS (Coinbase Design System) for it's robust set of reusable components.
 
-CDS component are fully themeable. Docs on that here: https://cds.coinbase.com/getting-started/theming/
+CDS usage guidelines here: @.claude/rules/cds.mdc
 
-Use CDS documentation for a list of all its components and usage guidelines: https://cds.coinbase.com/llms/web/routes.txt
+Use the `cds` MCP Server to help navigate CDS documentation.
+
+CDS component are fully themeable. Docs on that here: https://cds.coinbase.com/getting-started/theming/
 
 ### Authentication
 The project uses Better Auth for authentication; docs: https://better-auth.com/llms.txt
