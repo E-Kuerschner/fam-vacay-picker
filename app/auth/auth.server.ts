@@ -1,63 +1,55 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
-import {
-  createResendClient,
-  createEmailSender,
-  type ResendClient,
-} from "~/server/resend.server";
+import { createResendClient, createEmailSender, type ResendClient } from "~/server/resend.server";
 
-import {
-  createPlugins,
-  userAdditionalFields,
-  sessionAdditionalFields,
-} from "../../database/auth.config";
+import { createPlugins, userAdditionalFields, sessionAdditionalFields } from "../../database/auth.config";
 import * as schema from "../../database/schema";
 
 type CreateAuthParams = {
-  db: D1Database;
-  secret: string;
-  baseURL: string;
-  resend: ResendClient;
+	db: D1Database;
+	secret: string;
+	baseURL: string;
+	resend: ResendClient;
 };
 
 export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
-  const drizzleDb = drizzle(db);
-  const sendEmail = createEmailSender(resend);
+	const drizzleDb = drizzle(db);
+	const sendEmail = createEmailSender(resend);
 
-  const options = {
-    secret,
-    baseURL,
-    plugins: createPlugins({
-      sendMagicLink: async ({ email, url }) => {
-        await sendEmail({
-          to: email,
-          subject: "Sign in to Fam Vacay Picker",
-          html: `
+	const options = {
+		secret,
+		baseURL,
+		plugins: createPlugins({
+			sendMagicLink: async ({ email, url }) => {
+				await sendEmail({
+					to: email,
+					subject: "Sign in to Fam Vacay Picker",
+					html: `
             <h1>Sign in to Fam Vacay Picker</h1>
             <p>Click the link below to sign in:</p>
             <a href="${url}">Sign in</a>
             <p>This link will expire in 5 minutes.</p>
             <p>If you didn't request this email, you can safely ignore it.</p>
           `,
-        });
-      },
-    }),
-    user: {
-      additionalFields: userAdditionalFields,
-    },
-    session: {
-      additionalFields: sessionAdditionalFields,
-    },
-  };
+				});
+			},
+		}),
+		user: {
+			additionalFields: userAdditionalFields,
+		},
+		session: {
+			additionalFields: sessionAdditionalFields,
+		},
+	};
 
-  return betterAuth({
-    ...options,
-    database: drizzleAdapter(drizzleDb, {
-      provider: "sqlite",
-      schema,
-    }),
-  });
+	return betterAuth({
+		...options,
+		database: drizzleAdapter(drizzleDb, {
+			provider: "sqlite",
+			schema,
+		}),
+	});
 }
 
 export type Auth = ReturnType<typeof createAuth>;
@@ -67,14 +59,14 @@ export type Auth = ReturnType<typeof createAuth>;
  * Use in loaders/actions to get the auth instance.
  */
 export function getAuthFromEnv(env: Env) {
-  const resend = createResendClient({ apiKey: env.RESEND_API_KEY });
+	const resend = createResendClient({ apiKey: env.RESEND_API_KEY });
 
-  return createAuth({
-    db: env.DB,
-    secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.BETTER_AUTH_URL,
-    resend,
-  });
+	return createAuth({
+		db: env.DB,
+		secret: env.BETTER_AUTH_SECRET,
+		baseURL: env.BETTER_AUTH_URL,
+		resend,
+	});
 }
 
 /**
@@ -82,9 +74,9 @@ export function getAuthFromEnv(env: Env) {
  * Returns null if not authenticated.
  */
 export async function getSession(request: Request, env: Env) {
-  const auth = getAuthFromEnv(env);
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
-  return session;
+	const auth = getAuthFromEnv(env);
+	const session = await auth.api.getSession({
+		headers: request.headers,
+	});
+	return session;
 }

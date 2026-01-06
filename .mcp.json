@@ -1,11 +1,9 @@
 {
-  "mcpServers": {
-    "cds": {
-      "command": "bunx",
-      "args": [
-        "@coinbase/cds-mcp-server"
-      ],
-      "env": {}
-    }
-  }
+	"mcpServers": {
+		"cds": {
+			"command": "bunx",
+			"args": ["@coinbase/cds-mcp-server"],
+			"env": {}
+		}
+	}
 }

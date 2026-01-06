@@ -1,0 +1,22 @@
+/* Home page container */
+.home-page {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+/* Vacation link styling */
+.vacation-link {
+	padding: 0.5rem;
+	border-radius: 4px;
+	transition: background-color 0.2s;
+}
+
+.vacation-link:hover {
+	background-color: var(--cds-bg-elevation1, #f5f5f5);
+}
+
+.vacation-link a {
+	text-decoration: none;
+	color: inherit;
+}

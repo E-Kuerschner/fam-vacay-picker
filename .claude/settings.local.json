@@ -1,17 +1,18 @@
 {
-  "permissions": {
-    "allow": [
-      "mcp__better-auth__search",
-      "mcp__jetbrains__get_file_text_by_path",
-      "Bash(mkdir:*)",
-      "mcp__jetbrains__find_files_by_name_keyword",
-      "WebFetch(domain:cds.coinbase.com)",
-      "Bash(bun run typecheck:*)",
-      "WebSearch"
-    ]
-  },
-  "enabledMcpjsonServers": [
-    "cds"
-  ],
-  "enableAllProjectMcpServers": true
+	"permissions": {
+		"allow": [
+			"mcp__better-auth__search",
+			"mcp__jetbrains__get_file_text_by_path",
+			"Bash(mkdir:*)",
+			"mcp__jetbrains__find_files_by_name_keyword",
+			"WebFetch(domain:cds.coinbase.com)",
+			"Bash(bun run typecheck:*)",
+			"WebSearch",
+			"mcp__cds__list-cds-routes",
+			"mcp__cds__get-cds-doc",
+			"Bash(cat:*)"
+		]
+	},
+	"enableAllProjectMcpServers": true,
+	"enabledMcpjsonServers": ["cds"]
 }

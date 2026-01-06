@@ -6,21 +6,17 @@
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import {
-  createPlugins,
-  userAdditionalFields,
-  sessionAdditionalFields,
-} from "./database/auth.config";
+import { createPlugins, userAdditionalFields, sessionAdditionalFields } from "./database/auth.config";
 
 export const auth = betterAuth({
-  database: drizzleAdapter({} as never, {
-    provider: "sqlite",
-  }),
-  plugins: createPlugins(),
-  user: {
-    additionalFields: userAdditionalFields,
-  },
-  session: {
-    additionalFields: sessionAdditionalFields,
-  },
+	database: drizzleAdapter({} as never, {
+		provider: "sqlite",
+	}),
+	plugins: createPlugins(),
+	user: {
+		additionalFields: userAdditionalFields,
+	},
+	session: {
+		additionalFields: sessionAdditionalFields,
+	},
 });

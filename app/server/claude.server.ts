@@ -4,13 +4,13 @@ import type { MessageParam, ContentBlock } from "@anthropic-ai/sdk/resources/mes
 export type { MessageParam, ContentBlock };
 
 type CreateClaudeClientParams = {
-  apiKey: string;
+	apiKey: string;
 };
 
 export function createClaudeClient({ apiKey }: CreateClaudeClientParams) {
-  const client = new Anthropic({ apiKey });
+	const client = new Anthropic({ apiKey });
 
-  return client;
+	return client;
 }
 
 export type ClaudeClient = ReturnType<typeof createClaudeClient>;
@@ -20,7 +20,7 @@ export type ClaudeClient = ReturnType<typeof createClaudeClient>;
  * Use in loaders/actions to get the Claude client instance.
  */
 export function getClaudeFromEnv(env: Env) {
-  return createClaudeClient({
-    apiKey: env.ANTHROPIC_API_KEY,
-  });
+	return createClaudeClient({
+		apiKey: env.ANTHROPIC_API_KEY,
+	});
 }

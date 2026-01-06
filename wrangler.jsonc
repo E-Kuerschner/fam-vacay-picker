@@ -9,7 +9,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"main": "./workers/app.ts",
 	"observability": {
-		"enabled": true
+		"enabled": true,
 	},
 	/**
 	 * D1 Database
@@ -20,7 +20,7 @@
 			"binding": "DB",
 			"database_name": "fam-vacay-picker",
 			"database_id": "752cec47-b0e1-4d05-8a02-958c3d112c51",
-			"migrations_dir": "./database/migrations"
-		}
-	]
+			"migrations_dir": "./database/migrations",
+		},
+	],
 }

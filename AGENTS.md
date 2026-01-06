@@ -16,13 +16,14 @@ AI guidelines to Claude Code, Cursor and other agents.
 React Router generates types for its loaders, actions and other framework-level entities; documentation here: https://reactrouter.com/explanation/type-safety
 
 Import loader and action types from the route's corresponding type module:
+
 ```ts
 // app/routes/home/route.tsx
 import type { Route } from "./+types/route";
 
 // then in the loader
 export function loader({ params }: Route.LoaderArgs) {
-    // ...
+	// ...
 }
 ```
 
@@ -39,20 +40,23 @@ Use the `cds` MCP Server to help navigate CDS documentation.
 CDS component are fully themeable. Docs on that here: https://cds.coinbase.com/getting-started/theming/
 
 ### Authentication
+
 The project uses Better Auth for authentication; docs: https://better-auth.com/llms.txt
 
 Better Auth maintains its own database schema for auth concerns. Run `bun db:generate` to generate the necessary database migrations.
 
-The auth Drizzle database schema is generated and found at: `database/authSchema.ts`. This file is merged with the main Drizzle schema file: `database/schema.ts` 
+The auth Drizzle database schema is generated and found at: `database/authSchema.ts`. This file is merged with the main Drizzle schema file: `database/schema.ts`
 
 **IMPORTANT** Custom fields on the `users` table MUST ALWAYS be added via the `additionalFields` object in `auth/options.ts` file and NEVER added directly via a custom migration script or by editing the schema files.
 
 ### Database
+
 Uses Drizzle ORM with Cloudflare D1 (SQLite). Database schema is defined in `database/schema.ts`.
 
 To generate database migrations, run: `bun db:generate`.
 
 Required environment variables for database:
+
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_DATABASE_ID`
 - `CLOUDFLARE_ACCOUNT_TOKEN`
@@ -66,7 +70,7 @@ Instead, we favor writing modularized, plain CSS in `.css` files for every route
 For example, the home.tsx route should have a corresponding `home.css` file and import it at the top:
 
 ```ts
-import './home.css';
+import "./home.css";
 ```
 
 ### Animations
@@ -76,6 +80,7 @@ For simple state transitions we prefer to use CSS _transitions_.
 For complex animations or for spring animations, use `framer-motion`; docs: https://motion.dev/docs/react
 
 ## Development Notes
+
 - Ask clarifying questions when working on a complex task
 - Use React Router's `Form` component for submiting actions
 - Use Coinbase Design Systems' `Box`, `VStack`, `HStack` instead of divs for containers
@@ -91,3 +96,4 @@ For complex animations or for spring animations, use `framer-motion`; docs: http
 - NEVER manually create database migrations. ALWAYS relying on the database migration generator script
 - NEVER run database migrations files for me. I will always run them when I am ready to.
 - Always use `type` over `interface` for Typescript types
+- Always try to infer component prop types from route loader data rather than creating more types we have to maintain

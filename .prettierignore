@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build output
+build
+dist
+.output
+.react-router
+.wrangler
+
+# Database
+database/migrations
+*.sql
+
+# Generated files
+*.d.ts
+worker-configuration.d.ts
+database/authSchema.ts
+
+# Misc
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Package manager
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+bun.lockb
+bun.lock
