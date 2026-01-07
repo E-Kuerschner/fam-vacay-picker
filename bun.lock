@@ -5,7 +5,7 @@
       "name": "fam-vacay-picker",
       "dependencies": {
         "@anthropic-ai/sdk": "^0.71.2",
-        "@coinbase/cds-web": "^8.34.1",
+        "@coinbase/cds-web": "^8.36.1",
         "@googlemaps/js-api-loader": "^2.0.2",
         "better-auth": "^1.4.10",
         "drizzle-orm": "^0.45.1",
@@ -117,7 +117,7 @@
 
     "@cloudflare/workerd-windows-64": ["@cloudflare/workerd-windows-64@1.20251210.0", "", { "os": "win32", "cpu": "x64" }, "sha512-Uaz6/9XE+D6E7pCY4OvkCuJHu7HcSDzeGcCGY1HLhojXhHd7yL52c3yfiyJdS8hPatiAa0nn5qSI/42+aTdDSw=="],
 
-    "@coinbase/cds-common": ["@coinbase/cds-common@8.34.1", "", { "dependencies": { "@coinbase/cds-icons": "^5.9.0", "@coinbase/cds-illustrations": "^4.29.0", "@coinbase/cds-mcp-server": "^8.34.1", "@coinbase/cds-utils": "^2.3.5", "@modelcontextprotocol/sdk": "^1.13.1", "d3-array": "^3.2.4", "d3-color": "^3.1.0", "d3-interpolate": "^3.0.1", "d3-scale": "^4.0.2", "d3-shape": "^3.2.0", "lodash": "^4.17.21", "react-is": "^17.0.2", "type-fest": "^2.19.0", "zod": "^3.23.8" }, "peerDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" } }, "sha512-pSlWybUrqLmN5hBIXjEYQfTkrtisIGbWM1rBSr5gn56rGuANsMPtgLZlhoVVpkqvmBU/VQ52e6ob7sMibj1SRg=="],
+    "@coinbase/cds-common": ["@coinbase/cds-common@8.36.1", "", { "dependencies": { "@coinbase/cds-icons": "^5.9.0", "@coinbase/cds-illustrations": "^4.29.0", "@coinbase/cds-mcp-server": "^8.36.1", "@coinbase/cds-utils": "^2.3.5", "@modelcontextprotocol/sdk": "^1.13.1", "d3-array": "^3.2.4", "d3-color": "^3.1.0", "d3-interpolate": "^3.0.1", "d3-scale": "^4.0.2", "d3-shape": "^3.2.0", "lodash": "^4.17.21", "react-is": "^17.0.2", "type-fest": "^2.19.0", "zod": "^3.23.8" }, "peerDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" } }, "sha512-+aUTLvdKWgyag5KzCy6ak2qb4W00cmUNDoeZx1EsKUdwUYS6CEiPpvFut1ZHFiJbNd3CTLw+eqo5wlFQDDhyoQ=="],
 
     "@coinbase/cds-icons": ["@coinbase/cds-icons@5.9.0", "", {}, "sha512-3f340OoTGQ7qIxobjf21hJj1jKilC+Du7qZ30Mw1DGmwTdsmislrJ6Majjimt7r7+pcAKgGUKKwn2VLwxqI/jA=="],
 
@@ -125,11 +125,11 @@
 
     "@coinbase/cds-lottie-files": ["@coinbase/cds-lottie-files@3.3.4", "", {}, "sha512-SOWW97zwSgzrT7oKanwC/CfIB2MWJbyZduZzb3dSc8ACFy/qc5GN/IjH/Efty0p7zp+rUdEwOJj4d8/XhT/FKA=="],
 
-    "@coinbase/cds-mcp-server": ["@coinbase/cds-mcp-server@8.34.1", "", { "dependencies": { "@inquirer/prompts": "^7.5.3", "@modelcontextprotocol/sdk": "^1.13.1", "zod": "^3.23.8" }, "peerDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "bin": { "cds-mcp": "esm/server.js", "cds-mcp-server": "esm/server.js", "cds-mcp-setup": "esm/setup.js" } }, "sha512-EKR9llDebGx7XmttWXAjDpngCld4ly7sdZEEjrIQDGU0ADzP+f1w3cQIyiRUpGyXWiwbWe5dt74Ugo1n2MXA1g=="],
+    "@coinbase/cds-mcp-server": ["@coinbase/cds-mcp-server@8.36.1", "", { "dependencies": { "@inquirer/prompts": "^7.5.3", "@modelcontextprotocol/sdk": "^1.13.1", "zod": "^3.23.8" }, "bin": { "cds-mcp": "esm/server.js", "cds-mcp-server": "esm/server.js", "cds-mcp-setup": "esm/setup.js" } }, "sha512-tRKD+q/i7mY/bsjcqYY5Zyy4yxMEprkuO4Uy/ZF/hrRAy/SafY/mOLrbbroWZyK2V9ojq9G6WKMvQUSOhKrZJQ=="],
 
     "@coinbase/cds-utils": ["@coinbase/cds-utils@2.3.5", "", { "dependencies": { "humps": "^2.0.1", "type-fest": "^2.19.0" } }, "sha512-wyAAm54HtslDzcXkrT0MnBd5dKmYWSrxEE7mpTBUzJRQeeBH3kmcYEEZIR2+K7Lrp5FpDE5TObR1DPleWNybFg=="],
 
-    "@coinbase/cds-web": ["@coinbase/cds-web@8.34.1", "", { "dependencies": { "@coinbase/cds-common": "^8.34.1", "@coinbase/cds-icons": "^5.9.0", "@coinbase/cds-illustrations": "^4.29.0", "@coinbase/cds-lottie-files": "^3.3.4", "@coinbase/cds-utils": "^2.3.5", "@floating-ui/react-dom": "^2.1.1", "@popperjs/core": "^2.9.0", "@react-spring/web": "^9.7.4", "d3-interpolate": "^3.0.1", "d3-interpolate-path": "^2.3.0", "d3-selection": "^3.0.0", "fuse.js": "^7.1.0", "lodash": "^4.17.21", "lottie-web": "^5.13.0", "react-popper": "^2.2.4", "react-use-measure": "^2" }, "peerDependencies": { "framer-motion": "^10.18.0", "react": "^18.3.1", "react-dom": "^18.3.1" } }, "sha512-CWgrC3H5FOtm9+jVq0i5t7lC1WoHQPMZi3CqUbsxHQbqts3b9P4rttpKW01CHxZBHbpfJz/X8YcceUpr7E6mwA=="],
+    "@coinbase/cds-web": ["@coinbase/cds-web@8.36.1", "", { "dependencies": { "@coinbase/cds-common": "^8.36.1", "@coinbase/cds-icons": "^5.9.0", "@coinbase/cds-illustrations": "^4.29.0", "@coinbase/cds-lottie-files": "^3.3.4", "@coinbase/cds-utils": "^2.3.5", "@floating-ui/react-dom": "^2.1.1", "@popperjs/core": "^2.9.0", "@react-spring/web": "^9.7.4", "d3-interpolate": "^3.0.1", "d3-interpolate-path": "^2.3.0", "d3-selection": "^3.0.0", "fuse.js": "^7.1.0", "lodash": "^4.17.21", "lottie-web": "^5.13.0", "react-popper": "^2.2.4", "react-use-measure": "^2" }, "peerDependencies": { "framer-motion": "^10.18.0", "react": "^18.3.1", "react-dom": "^18.3.1" } }, "sha512-or7RIhFuEkZhgFfGyg/PCw0DC74UdIEAAeKZ4FeqUHsJ38lAS2k6v+t0ubdsWexzV5n67rsY7mlZopwGchKnNA=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 

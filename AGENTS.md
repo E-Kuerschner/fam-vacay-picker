@@ -33,7 +33,7 @@ export function loader({ params }: Route.LoaderArgs) {
 
 We use CDS (Coinbase Design System) for it's robust set of reusable components.
 
-CDS usage guidelines here: @.claude/rules/cds.mdc
+CDS usage guidelines here: @.claude/rules/cds.md
 
 Use the `cds` MCP Server to help navigate CDS documentation.
 

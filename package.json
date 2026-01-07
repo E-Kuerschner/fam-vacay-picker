@@ -19,7 +19,7 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.71.2",
-		"@coinbase/cds-web": "^8.34.1",
+		"@coinbase/cds-web": "^8.36.1",
 		"@googlemaps/js-api-loader": "^2.0.2",
 		"better-auth": "^1.4.10",
 		"drizzle-orm": "^0.45.1",
