@@ -97,3 +97,4 @@ For complex animations or for spring animations, use `framer-motion`; docs: http
 - NEVER run database migrations files for me. I will always run them when I am ready to.
 - Always use `type` over `interface` for Typescript types
 - Always try to infer component prop types from route loader data rather than creating more types we have to maintain
+- FOR LINK use the Link component in `app/components/Link.tsx`

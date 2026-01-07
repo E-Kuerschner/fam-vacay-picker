@@ -1,21 +1,10 @@
+import type { Route } from "./+types/route";
 import { Link } from "react-router";
 import { VStack, Box } from "@coinbase/cds-web/layout";
 import { Text } from "@coinbase/cds-web/typography/Text";
 
-type VacationCycle = {
-	id: number;
-	year: number;
-	status: "draft" | "open" | "finalized";
-	submissionStartDate: Date | null;
-	submissionEndDate: Date | null;
-	winningProposalId: number | null;
-	finalizedAt: Date | null;
-	createdAt: Date;
-	updatedAt: Date;
-};
-
 type VacationListProps = {
-	vacations: VacationCycle[];
+	vacations: Route.ComponentProps["loaderData"]["pastVacations"];
 };
 
 export function VacationList({ vacations }: VacationListProps) {

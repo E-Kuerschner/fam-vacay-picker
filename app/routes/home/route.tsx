@@ -1,15 +1,18 @@
 import type { Route } from "./+types/route";
-import { redirect, Link } from "react-router";
+import { redirect, useNavigate } from "react-router";
 import { useState } from "react";
 import { drizzle } from "drizzle-orm/d1";
 import { gte, lt, asc, desc, eq, count } from "drizzle-orm";
 import { getSession } from "~/auth/auth.server";
 import { Button } from "@coinbase/cds-web/buttons";
+import { ListCell } from "@coinbase/cds-web/cells";
 import { VStack, HStack, Box } from "@coinbase/cds-web/layout";
+import { Banner } from "@coinbase/cds-web/banner";
 import { Text } from "@coinbase/cds-web/typography/Text";
 import { signOut } from "~/auth/auth.client";
 import * as schema from "../../../database/schema";
 import { vacationCycle, user } from "../../../database/schema";
+import { Link } from "../../components/Link";
 import { VacationList } from "./VacationList";
 import { CreateVacationModal } from "./CreateVacationModal";
 import "./home.css";
@@ -103,6 +106,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 }
 
 export default function Home({ loaderData, actionData }: Route.ComponentProps) {
+	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 	const { session, nextVacation, pastVacations, expectedProposals, hasSubmittedProposal } = loaderData;
 	const isAdmin = session.user.role === "admin";
@@ -110,6 +114,10 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 	async function handleSignOut() {
 		await signOut();
 		window.location.reload();
+	}
+
+	function handleVacationClick(vacationId: number) {
+		navigate(`/vacation/${vacationId}`);
 	}
 
 	return (
@@ -130,25 +138,22 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 					<Text font="title2">Next Vacation</Text>
 					{nextVacation ? (
 						<VStack gap={2}>
-							<Box className="vacation-link">
-								<Link to={`/vacation/${nextVacation.id}`}>
-									<Text>
-										{nextVacation.year} - {nextVacation.status}
-									</Text>
-								</Link>
-							</Box>
+							<ListCell
+								onClick={() => handleVacationClick(nextVacation.id)}
+								title={nextVacation.year}
+								description={nextVacation.status}
+								accessory="arrow"
+							/>
 							<Text font="label2" color="fgMuted">
 								Proposals: {nextVacation.proposals.length}/{expectedProposals}
 							</Text>
 							{!hasSubmittedProposal && (
-								<Box background="accentSubtleBlue" padding={3} borderRadius={300}>
+								<Banner variant="promotional" startIcon="exclamationMark" title="Submit your proposal!">
 									<VStack gap={2}>
 										<Text font="label1">You haven't submitted a proposal yet</Text>
-										<Link to={`/vacation/${nextVacation.id}/proposal/new`}>
-											<Button compact>Submit a Proposal</Button>
-										</Link>
+										<Link to={`/proposals/new?vacation=${nextVacation.id}`}>Submit a Proposal</Link>
 									</VStack>
-								</Box>
+								</Banner>
 							)}
 						</VStack>
 					) : (
