@@ -148,7 +148,6 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 
 	// conditional UI
 	const [showConflictModal, setShowConflictModal] = useState(false);
-	const [showMap, setShowMap] = useState(false);
 
 	// async operation pending states
 	const [isFetchingImage, setIsFetchingImage] = useState(false);
@@ -161,11 +160,17 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 	const [activities, setActivities] = useState("");
 	const [budgetEstimate, setBudgetEstimate] = useState("");
 	const [conflictResolution, setConflictResolution] = useState<string | null>(null);
+	const [selectedPlace, setSelectedPlace] = useState<{
+		name: string;
+		coordinates: { lat: number; lng: number };
+	} | null>(null);
 
 	// Google Maps
 	const mapRef = useRef<HTMLDivElement>(null);
 	const mapInstanceRef = useRef<google.maps.Map | null>(null);
 	const markerRef = useRef<google.maps.Marker | null>(null);
+	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	// Set Google Maps API options once on mount
 	useEffect(() => {
@@ -174,6 +179,64 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 			v: "weekly",
 		});
 	}, [googleMapsApiKey]);
+
+	// Initialize Google Places Autocomplete
+	useEffect(() => {
+		if (!inputRef.current) return;
+
+		const initAutocomplete = async () => {
+			try {
+				const { Autocomplete } = await importLibrary("places");
+
+				const autocomplete = new Autocomplete(inputRef.current!, {
+					// types: ["geocode"],
+					fields: ["name", "formatted_address", "geometry", "place_id"],
+				});
+
+				autocomplete.addListener("place_changed", () => {
+					const place = autocomplete.getPlace();
+
+					if (place.geometry?.location && place.name) {
+						const name = place.name;
+						const coordinates = {
+							lat: place.geometry.location.lat(),
+							lng: place.geometry.location.lng(),
+						};
+
+						setDestinationName(name);
+						setSelectedPlace({ name, coordinates });
+
+						// Update map immediately if visible
+						if (mapInstanceRef.current) {
+							mapInstanceRef.current.setCenter(place.geometry.location);
+							mapInstanceRef.current.setZoom(12);
+
+							// Remove old marker if exists
+							if (markerRef.current) {
+								markerRef.current.setMap(null);
+							}
+
+							// Create new marker
+							importLibrary("marker").then(({ Marker }) => {
+								const marker = new Marker({
+									position: place.geometry?.location,
+									map: mapInstanceRef.current,
+									title: name,
+								});
+								markerRef.current = marker;
+							});
+						}
+					}
+				});
+
+				autocompleteRef.current = autocomplete;
+			} catch (error) {
+				console.error("Error initializing autocomplete:", error);
+			}
+		};
+
+		initAutocomplete();
+	}, []);
 
 	// Fetch random image from Unsplash via our unsplash API route
 	async function fetchRandomImage() {
@@ -305,7 +368,7 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 
 	// Initialize map when shown
 	useEffect(() => {
-		if (!showMap || !mapRef.current) return;
+		if (!mapRef.current) return;
 
 		// Don't reinitialize if map already exists
 		if (mapInstanceRef.current) return;
@@ -319,7 +382,7 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 				const map = new Map(mapRef.current!, {
 					center: { lat: 0, lng: 0 },
 					zoom: 2,
-					disableDefaultUI: false,
+					disableDefaultUI: true,
 					zoomControl: true,
 				});
 
@@ -335,15 +398,7 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 		};
 
 		initMap();
-
-		// Cleanup when map is hidden
-		return () => {
-			if (!showMap) {
-				mapInstanceRef.current = null;
-				markerRef.current = null;
-			}
-		};
-	}, [showMap, destinationName]);
+	}, [destinationName]);
 
 	// Handle form submission - intercept if conflict exists
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -400,30 +455,32 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 
 						{/* Destination Name */}
 						<VStack gap={2}>
-							<TextInput
-								name="destinationName"
-								label="Destination"
-								placeholder="e.g., Paris, France"
-								required
-								helperText="Where do you want to go?"
-								value={destinationName}
-								onChange={(e) => setDestinationName(e.target.value)}
-								onBlur={geocodeDestination}
-							/>
-							<Button variant="secondary" compact onClick={() => setShowMap(!showMap)}>
-								{showMap ? "Hide Map" : "Show Map"}
-							</Button>
-							{showMap && (
-								<Box
-									ref={mapRef}
-									style={{
-										width: "100%",
-										height: "300px",
-										borderRadius: "8px",
-										overflow: "hidden",
-									}}
+							<VStack gap={1} className="destination-input-wrapper">
+								<label htmlFor="destinationName" className="destination-label">
+									<Text font="label1">Destination</Text>
+								</label>
+								<input
+									ref={inputRef}
+									id="destinationName"
+									name="destinationName"
+									type="text"
+									placeholder="e.g., Paris, France"
+									required
+									className="destination-input"
 								/>
-							)}
+								<Text font="label2" color="fgMuted">
+									Where do you want to go? Start typing for suggestions.
+								</Text>
+							</VStack>
+							<Box
+								ref={mapRef}
+								style={{
+									width: "100%",
+									height: "300px",
+									borderRadius: "8px",
+									overflow: "hidden",
+								}}
+							/>
 						</VStack>
 
 						{/* Destination Image URL with Fetch Button */}
