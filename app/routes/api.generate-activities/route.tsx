@@ -26,7 +26,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 			async start(controller) {
 				try {
 					const messageStream = await anthropic.messages.create({
-						model: "claude-3-5-haiku-20241022",
+						model: "claude-haiku-4-5",
 						max_tokens: 500,
 						stream: true,
 						messages: [
@@ -57,7 +57,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 			headers: {
 				"Content-Type": "text/plain; charset=utf-8",
 				"Cache-Control": "no-cache",
-				"Connection": "keep-alive",
+				Connection: "keep-alive",
 			},
 		});
 	} catch (error) {

@@ -1,9 +1,9 @@
 import type { Route } from "./+types/route";
-import { redirect } from "react-router";
-import { useState, type FormEvent } from "react";
+import { redirect, Form } from "react-router";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
-import { getSession } from "~/auth/auth.server";
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { Button } from "@coinbase/cds-web/buttons";
 import { IconButton } from "@coinbase/cds-web/buttons/IconButton";
 import { VStack, HStack, Box } from "@coinbase/cds-web/layout";
@@ -11,7 +11,7 @@ import { Banner } from "@coinbase/cds-web/banner";
 import { Text } from "@coinbase/cds-web/typography/Text";
 import { TextInput } from "@coinbase/cds-web/controls";
 import { RemoteImage } from "@coinbase/cds-web/media/RemoteImage";
-import { Form } from "react-router";
+import { getSession } from "~/auth/auth.server";
 import * as schema from "../../../database/schema";
 import { proposal, vacationCycle, vacationCycleProposal } from "../../../database/schema";
 import { Link } from "../../components/Link";
@@ -19,7 +19,7 @@ import { ConflictResolutionModal } from "./ConflictResolutionModal";
 import "./proposals-new.css";
 
 export function meta({}: Route.MetaArgs) {
-	return [{ title: "Create Proposal - Fam Vacay Picker" }, { name: "description", content: "Create a new vacation proposal" }];
+	return [{ title: "Submit Proposal - Fam Vacay Picker" }, { name: "description", content: "Create a new vacation proposal" }];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {
@@ -50,7 +50,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 			throw new Response("Vacation cycle not found", { status: 404 });
 		}
 
-		// Check for existing proposal by this user for this cycle
+		// Checks for any existing proposals created by this user which are already submitted for the specified vacation
 		const existingResults = await db
 			.select({
 				proposal: proposal,
@@ -68,6 +68,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 		vacationCycleId,
 		vacation,
 		existingProposal,
+		googleMapsApiKey: context.cloudflare.env.GOOGLE_MAPS_API_KEY,
 	};
 }
 
@@ -125,7 +126,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 		})
 		.returning();
 
-	// Create association (NOT for "save_for_later")
+	// Only create the association between vacation && new proposal if conflictAction IS NOT for "save_for_later"
 	if (vacationId && conflictAction !== "save_for_later") {
 		await db.insert(vacationCycleProposal).values({
 			vacationCycleId: vacationId,
@@ -143,27 +144,38 @@ export async function action({ request, context }: Route.ActionArgs) {
 }
 
 export default function ProposalNew({ loaderData, actionData }: Route.ComponentProps) {
-	const { session, vacationCycleId, vacation, existingProposal } = loaderData;
+	const { vacationCycleId, vacation, existingProposal, googleMapsApiKey } = loaderData;
+
+	// conditional UI
 	const [showConflictModal, setShowConflictModal] = useState(false);
-	const [conflictResolution, setConflictResolution] = useState<string | null>(null);
-	const [destinationName, setDestinationName] = useState("");
-	const [imageUrl, setImageUrl] = useState("");
+	const [showMap, setShowMap] = useState(false);
+
+	// async operation pending states
 	const [isFetchingImage, setIsFetchingImage] = useState(false);
-	const [activities, setActivities] = useState("");
 	const [isGeneratingActivities, setIsGeneratingActivities] = useState(false);
-	const [budgetEstimate, setBudgetEstimate] = useState("");
 	const [isGeneratingBudget, setIsGeneratingBudget] = useState(false);
 
-	// Handle form submission - intercept if conflict exists
-	function handleSubmit(e: FormEvent) {
-		if (existingProposal && !conflictResolution) {
-			e.preventDefault();
-			setShowConflictModal(true);
-		}
-		// Otherwise allow normal form submission
-	}
+	// Create proposal form state:
+	const [destinationName, setDestinationName] = useState("");
+	const [imageUrl, setImageUrl] = useState("");
+	const [activities, setActivities] = useState("");
+	const [budgetEstimate, setBudgetEstimate] = useState("");
+	const [conflictResolution, setConflictResolution] = useState<string | null>(null);
 
-	// Fetch random image from Unsplash via our API route
+	// Google Maps
+	const mapRef = useRef<HTMLDivElement>(null);
+	const mapInstanceRef = useRef<google.maps.Map | null>(null);
+	const markerRef = useRef<google.maps.Marker | null>(null);
+
+	// Set Google Maps API options once on mount
+	useEffect(() => {
+		setOptions({
+			key: googleMapsApiKey,
+			v: "weekly",
+		});
+	}, [googleMapsApiKey]);
+
+	// Fetch random image from Unsplash via our unsplash API route
 	async function fetchRandomImage() {
 		if (!destinationName.trim()) return;
 
@@ -250,6 +262,98 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 		}
 	}
 
+	// Geocode destination and update map
+	const geocodeDestination = useCallback(async () => {
+		if (!destinationName.trim() || !mapInstanceRef.current) return;
+
+		try {
+			// Import the geocoding library
+			const { Geocoder } = await importLibrary("geocoding");
+			const geocoder = new Geocoder();
+
+			// Geocode the destination
+			geocoder.geocode({ address: destinationName }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
+				if (status === "OK" && results && results.length > 0) {
+					const location = results[0].geometry.location;
+
+					// Center map on the location
+					mapInstanceRef.current?.setCenter(location);
+					mapInstanceRef.current?.setZoom(12);
+
+					// Remove old marker if exists
+					if (markerRef.current) {
+						markerRef.current.setMap(null);
+					}
+
+					// Create new marker
+					importLibrary("marker").then(({ Marker }) => {
+						const marker = new Marker({
+							position: location,
+							map: mapInstanceRef.current,
+							title: destinationName,
+						});
+						markerRef.current = marker;
+					});
+				} else {
+					console.error("Geocoding failed:", status);
+				}
+			});
+		} catch (error) {
+			console.error("Error geocoding destination:", error);
+		}
+	}, [destinationName]);
+
+	// Initialize map when shown
+	useEffect(() => {
+		if (!showMap || !mapRef.current) return;
+
+		// Don't reinitialize if map already exists
+		if (mapInstanceRef.current) return;
+
+		const initMap = async () => {
+			try {
+				// Import the Maps library
+				const { Map } = await importLibrary("maps");
+
+				// Create map instance with default world view
+				const map = new Map(mapRef.current!, {
+					center: { lat: 0, lng: 0 },
+					zoom: 2,
+					disableDefaultUI: false,
+					zoomControl: true,
+				});
+
+				mapInstanceRef.current = map;
+
+				// If we have a destination already, geocode it
+				if (destinationName.trim()) {
+					geocodeDestination();
+				}
+			} catch (error) {
+				console.error("Error initializing map:", error);
+			}
+		};
+
+		initMap();
+
+		// Cleanup when map is hidden
+		return () => {
+			if (!showMap) {
+				mapInstanceRef.current = null;
+				markerRef.current = null;
+			}
+		};
+	}, [showMap, destinationName]);
+
+	// Handle form submission - intercept if conflict exists
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		if (existingProposal && !conflictResolution) {
+			e.preventDefault();
+			setShowConflictModal(true);
+		}
+		// Otherwise allow normal form submission (default submit behavior)
+	}
+
 	function handleConflictResolution(action: "save_for_later" | "replace" | "throw_out") {
 		setConflictResolution(action);
 		setShowConflictModal(false);
@@ -295,15 +399,32 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 						)}
 
 						{/* Destination Name */}
-						<TextInput
-							name="destinationName"
-							label="Destination"
-							placeholder="e.g., Paris, France"
-							required
-							helperText="Where do you want to go?"
-							value={destinationName}
-							onChange={(e) => setDestinationName(e.target.value)}
-						/>
+						<VStack gap={2}>
+							<TextInput
+								name="destinationName"
+								label="Destination"
+								placeholder="e.g., Paris, France"
+								required
+								helperText="Where do you want to go?"
+								value={destinationName}
+								onChange={(e) => setDestinationName(e.target.value)}
+								onBlur={geocodeDestination}
+							/>
+							<Button variant="secondary" compact onClick={() => setShowMap(!showMap)}>
+								{showMap ? "Hide Map" : "Show Map"}
+							</Button>
+							{showMap && (
+								<Box
+									ref={mapRef}
+									style={{
+										width: "100%",
+										height: "300px",
+										borderRadius: "8px",
+										overflow: "hidden",
+									}}
+								/>
+							)}
+						</VStack>
 
 						{/* Destination Image URL with Fetch Button */}
 						<VStack gap={2}>
@@ -343,13 +464,7 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 										label="Activities (Optional)"
 										placeholder="Describe activities you'd like to do..."
 										helperText="What would you like to do there? Or click the robot icon to generate ideas."
-										inputNode={
-											<textarea
-												rows={4}
-												value={activities}
-												onChange={(e) => setActivities(e.target.value)}
-											/>
-										}
+										inputNode={<textarea rows={4} value={activities} onChange={(e) => setActivities(e.target.value)} />}
 									/>
 								</Box>
 								<IconButton
