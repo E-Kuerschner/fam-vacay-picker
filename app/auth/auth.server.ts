@@ -18,8 +18,6 @@ export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
 	const sendEmail = createEmailSender(resend);
 
 	const options = {
-		secret,
-		baseURL,
 		plugins: createPlugins({
 			sendMagicLink: async ({ email, url }) => {
 				await sendEmail({
@@ -40,10 +38,17 @@ export function createAuth({ db, secret, baseURL, resend }: CreateAuthParams) {
 		},
 		session: {
 			additionalFields: sessionAdditionalFields,
+			// session stored in cookie to prevent frequently hitting database
+			cookieCache: {
+				enabled: true,
+				maxAge: 60 * 60 * 24 * 1, // one day
+			},
 		},
 	};
 
 	return betterAuth({
+		secret,
+		baseURL,
 		...options,
 		database: drizzleAdapter(drizzleDb, {
 			provider: "sqlite",

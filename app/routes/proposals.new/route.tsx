@@ -206,7 +206,12 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 						setDestinationName(name);
 						setSelectedPlace({ name, coordinates });
 
-						// Update map immediately if visible
+						// Clear all other inputs when location changes
+						setImageUrl("");
+						setActivities("");
+						setBudgetEstimate("");
+
+						// Update map to the selected location
 						if (mapInstanceRef.current) {
 							mapInstanceRef.current.setCenter(place.geometry.location);
 							mapInstanceRef.current.setZoom(12);
@@ -378,10 +383,10 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 				// Import the Maps library
 				const { Map } = await importLibrary("maps");
 
-				// Create map instance with default world view
+				// Create map instance with default view centered on Chicago
 				const map = new Map(mapRef.current!, {
-					center: { lat: 0, lng: 0 },
-					zoom: 2,
+					center: { lat: 41.8781, lng: -87.6298 },
+					zoom: 10,
 					disableDefaultUI: true,
 					zoomControl: true,
 				});
