@@ -1,0 +1,80 @@
+.proposals-page {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+.empty-state {
+	padding: 4rem 2rem;
+	text-align: center;
+	background-color: var(--cds-bg-elevation1, #f5f5f5);
+	border-radius: 12px;
+}
+
+.proposal-card-link {
+	text-decoration: none;
+	color: inherit;
+	display: block;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.proposal-card-link:hover {
+	transform: translateY(-2px);
+}
+
+.proposal-card {
+	padding: 1.5rem;
+	background-color: var(--cds-bg-elevation1, #ffffff);
+	border-radius: 12px;
+	border: 1px solid var(--cds-border-default, #e5e7eb);
+	transition: box-shadow 0.2s ease;
+	cursor: pointer;
+}
+
+.proposal-card:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.proposal-image {
+	flex-shrink: 0;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.proposal-image-placeholder {
+	width: 200px;
+	height: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--cds-bg-elevation2, #e5e7eb);
+	border-radius: 8px;
+	flex-shrink: 0;
+}
+
+.vacation-cycle-badge {
+	padding: 0.25rem 0.75rem;
+	background-color: var(--cds-bg-primary-muted, #dbeafe);
+	color: var(--cds-fg-primary, #1e40af);
+	border-radius: 16px;
+	display: inline-block;
+}
+
+@media (max-width: 768px) {
+	.proposals-page {
+		padding: 1rem;
+	}
+
+	.proposal-card {
+		padding: 1rem;
+	}
+
+	.proposal-card > div {
+		flex-direction: column;
+	}
+
+	.proposal-image,
+	.proposal-image-placeholder {
+		width: 100%;
+	}
+}

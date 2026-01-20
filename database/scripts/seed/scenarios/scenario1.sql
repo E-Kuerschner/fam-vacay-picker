@@ -1,0 +1,3 @@
+-- Scenario 1: No new vacation
+-- Only shared data (users + 2023 past vacation) is seeded
+-- This file intentionally left empty

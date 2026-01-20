@@ -13,6 +13,7 @@ import { signOut } from "~/auth/auth.client";
 import * as schema from "../../../database/schema";
 import { vacationCycle, user } from "../../../database/schema";
 import { Link } from "../../components/Link";
+import { getStatusLabel } from "../../utils/vacationStatus";
 import { VacationList } from "./VacationList";
 import { CreateVacationModal } from "./CreateVacationModal";
 import "./home.css";
@@ -96,7 +97,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 		.insert(vacationCycle)
 		.values({
 			year,
-			status: "draft" as const,
+			status: "submission_open" as const,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
@@ -124,13 +125,20 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 		<Box className="home-page">
 			<VStack gap={6}>
 				{/* Header with greeting and logout */}
-				<HStack gap={2} justifyContent="flex-end" alignItems="center">
+				<HStack gap={2} justifyContent="space-between" alignItems="center">
 					<Text font="label2" color="fgPrimary">
 						Hello, {session.user.name}!
 					</Text>
-					<Button onClick={handleSignOut} variant="secondary" compact>
-						Log Out
-					</Button>
+					<HStack gap={2}>
+						<Link to="/proposals">
+							<Button variant="secondary" compact>
+								My Proposals
+							</Button>
+						</Link>
+						<Button onClick={handleSignOut} variant="secondary" compact>
+							Log Out
+						</Button>
+					</HStack>
 				</HStack>
 
 				{/* Next Vacation Section */}
@@ -141,18 +149,28 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 							<ListCell
 								onClick={() => handleVacationClick(nextVacation.id)}
 								title={nextVacation.year}
-								description={nextVacation.status}
+								description={getStatusLabel(nextVacation.status)}
 								accessory="arrow"
 							/>
 							<Text font="label2" color="fgMuted">
 								Proposals: {nextVacation.proposals.length}/{expectedProposals}
 							</Text>
-							{!hasSubmittedProposal && (
+							{!hasSubmittedProposal && nextVacation.status === "submission_open" && (
 								<Banner variant="promotional" startIcon="exclamationMark" title="Submit your proposal!">
 									<VStack gap={2}>
 										<Text font="label1">You haven't submitted a proposal yet</Text>
 										<Link to={`/proposals/new?vacation=${nextVacation.id}`}>Submit a Proposal</Link>
 									</VStack>
+								</Banner>
+							)}
+							{nextVacation.status === "selection_complete" && (
+								<Banner variant="informational" startIcon="info" title="Winner Selected!">
+									<Text font="label1">A winner has been selected. View details on the vacation page.</Text>
+								</Banner>
+							)}
+							{nextVacation.status === "trip_finalized" && nextVacation.vacationDate && (
+								<Banner variant="informational" startIcon="checkmark" title="Trip Confirmed!">
+									<Text font="label1">Trip confirmed for {new Date(nextVacation.vacationDate).toLocaleDateString()}</Text>
 								</Banner>
 							)}
 						</VStack>

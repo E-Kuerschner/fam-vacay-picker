@@ -15,6 +15,13 @@
       "when": 1767595287765,
       "tag": "0001_worthless_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1768868368817,
+      "tag": "0002_hot_martin_li",
+      "breakpoints": true
     }
   ]
 }

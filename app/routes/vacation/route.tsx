@@ -8,6 +8,7 @@ import { Button } from "@coinbase/cds-web/buttons";
 import { getSession } from "~/auth/auth.server";
 import * as schema from "../../../database/schema";
 import { vacationCycle } from "../../../database/schema";
+import { getStatusLabel } from "../../utils/vacationStatus";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [{ title: `Vacation ${params.id} - Fam Vacay Picker` }, { name: "description", content: "Vacation details" }];
@@ -24,11 +25,19 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
 	const db = drizzle(context.cloudflare.env.DB, { schema });
 	const vacationId = Number(params.id);
 
-	// Query vacation by ID with proposals relation
+	// Query vacation by ID with proposals relation including submitter info
 	const vacation = await db.query.vacationCycle.findFirst({
 		where: eq(vacationCycle.id, vacationId),
 		with: {
-			proposals: true,
+			proposals: {
+				with: {
+					proposal: {
+						with: {
+							submitter: true,
+						},
+					},
+				},
+			},
 		},
 	});
 
@@ -36,14 +45,111 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
 		throw new Response("Vacation not found", { status: 404 });
 	}
 
+	// Get all users to determine who hasn't submitted
+	const allUsers = await db.query.user.findMany();
+
 	return {
 		session,
 		vacation,
+		allUsers,
 	};
 }
 
+function SubmissionOpenView({ vacation, allUsers }: { vacation: any; allUsers: any[] }) {
+	// Extract submitted user IDs from proposals
+	const submittedUserIds = new Set(vacation.proposals.map((vcp: any) => vcp.proposal.userId));
+
+	// Calculate who hasn't submitted yet
+	const usersWhoHaventSubmitted = allUsers.filter((user) => !submittedUserIds.has(user.id));
+
+	const totalExpected = allUsers.length;
+	const totalSubmitted = vacation.proposals.length;
+	const totalPending = totalExpected - totalSubmitted;
+
+	return (
+		<VStack gap={4}>
+			<VStack gap={2}>
+				<Text>
+					<strong>Status:</strong> {getStatusLabel(vacation.status)}
+				</Text>
+				<Text>
+					<strong>Submissions:</strong> {totalSubmitted} of {totalExpected} ({totalPending} pending)
+				</Text>
+			</VStack>
+
+			{/* Submitted proposals list */}
+			{vacation.proposals.length > 0 && (
+				<VStack gap={2}>
+					<Text font="title3">Submitted Proposals</Text>
+					{vacation.proposals.map((vcp: any) => (
+						<Box
+							key={vcp.proposalId}
+							style={{
+								padding: "1rem",
+								backgroundColor: "var(--cds-bg-elevation1, #f5f5f5)",
+								borderRadius: "8px",
+							}}
+						>
+							<VStack gap={1}>
+								<Text font="title4">{vcp.proposal.destinationName}</Text>
+								<Text font="label2" color="fgMuted">
+									Submitted by {vcp.proposal.submitter.name || vcp.proposal.submitter.email}
+								</Text>
+							</VStack>
+						</Box>
+					))}
+				</VStack>
+			)}
+
+			{/* Pending submissions */}
+			{usersWhoHaventSubmitted.length > 0 && (
+				<VStack gap={2}>
+					<Text font="title3">Waiting for Submissions From</Text>
+					{usersWhoHaventSubmitted.map((user) => (
+						<Box
+							key={user.id}
+							style={{
+								padding: "0.75rem 1rem",
+								backgroundColor: "var(--cds-bg-elevation1, #f5f5f5)",
+								borderRadius: "8px",
+								opacity: 0.7,
+							}}
+						>
+							<Text>{user.name || user.email}</Text>
+						</Box>
+					))}
+				</VStack>
+			)}
+		</VStack>
+	);
+}
+
+function SelectionCompleteView({ vacation }: { vacation: any }) {
+	return (
+		<Box padding={2} background="bgElevation1" borderRadius={400}>
+			<Text font="title1">Winner selected - Details coming soon</Text>
+		</Box>
+	);
+}
+
+function TripFinalizedView({ vacation }: { vacation: any }) {
+	return (
+		<Box padding={2} background="bgElevation1" borderRadius={400}>
+			<Text font="title1">Trip finalized - Details coming soon</Text>
+		</Box>
+	);
+}
+
+function PastVacationView({ vacation }: { vacation: any }) {
+	return (
+		<Box padding={2} background="bgElevation1" borderRadius={400}>
+			<Text font="title1">Past vacation - Details coming soon</Text>
+		</Box>
+	);
+}
+
 export default function VacationDetail({ loaderData }: Route.ComponentProps) {
-	const { vacation } = loaderData;
+	const { vacation, allUsers } = loaderData;
 
 	return (
 		<Box style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
@@ -56,24 +162,14 @@ export default function VacationDetail({ loaderData }: Route.ComponentProps) {
 
 				<Text font="display1">{vacation.year} Vacation</Text>
 
-				<VStack gap={2}>
-					<Text>
-						<strong>Status:</strong> {vacation.status}
-					</Text>
-					<Text>
-						<strong>Proposals:</strong> {vacation.proposals.length}
-					</Text>
-				</VStack>
+				{/* Status-specific views */}
+				{vacation.status === "submission_open" && <SubmissionOpenView vacation={vacation} allUsers={allUsers} />}
 
-				<Box
-					style={{
-						padding: "1.5rem",
-						backgroundColor: "var(--cds-bg-elevation1, #f5f5f5)",
-						borderRadius: "8px",
-					}}
-				>
-					<Text font="title1">Vacation detail page - Coming soon</Text>
-				</Box>
+				{vacation.status === "selection_complete" && <SelectionCompleteView vacation={vacation} />}
+
+				{vacation.status === "trip_finalized" && <TripFinalizedView vacation={vacation} />}
+
+				{vacation.status === "past" && <PastVacationView vacation={vacation} />}
 			</VStack>
 		</Box>
 	);

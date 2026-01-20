@@ -8,11 +8,12 @@ export * from "./authSchema";
 export const vacationCycle = sqliteTable("vacation_cycle", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	year: integer("year").notNull(),
-	status: text("status", { enum: ["draft", "open", "finalized"] }).notNull(),
+	status: text("status", { enum: ["submission_open", "selection_complete", "trip_finalized", "past"] }).notNull(),
 	submissionStartDate: integer("submission_start_date", { mode: "timestamp" }),
 	submissionEndDate: integer("submission_end_date", { mode: "timestamp" }),
 	winningProposalId: integer("winning_proposal_id").references(() => proposal.id, { onDelete: "set null" }),
 	finalizedAt: integer("finalized_at", { mode: "timestamp" }),
+	vacationDate: integer("vacation_date", { mode: "timestamp" }),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });

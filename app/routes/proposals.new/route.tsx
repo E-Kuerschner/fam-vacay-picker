@@ -1,5 +1,5 @@
 import type { Route } from "./+types/route";
-import { redirect, Form } from "react-router";
+import { redirect, Form, useNavigate } from "react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
@@ -50,6 +50,11 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 			throw new Response("Vacation cycle not found", { status: 404 });
 		}
 
+		// Check if vacation is open for submissions
+		if (vacation.status !== "submission_open") {
+			throw new Response("This vacation cycle is no longer accepting proposals", { status: 403 });
+		}
+
 		// Checks for any existing proposals created by this user which are already submitted for the specified vacation
 		const existingResults = await db
 			.select({
@@ -98,6 +103,21 @@ export async function action({ request, context }: Route.ActionArgs) {
 
 	const db = drizzle(context.cloudflare.env.DB, { schema });
 
+	// If vacation cycle ID is provided, verify it exists and is open for submissions
+	if (vacationId) {
+		const vacation = await db.query.vacationCycle.findFirst({
+			where: eq(vacationCycle.id, vacationId),
+		});
+
+		if (!vacation) {
+			return { error: "Vacation cycle not found" };
+		}
+
+		if (vacation.status !== "submission_open") {
+			return { error: "This vacation cycle is no longer accepting proposals" };
+		}
+	}
+
 	// Handle "throw_out" - redirect without changes
 	if (conflictAction === "throw_out" && vacationId) {
 		return redirect(`/vacation/${vacationId}`);
@@ -144,6 +164,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 }
 
 export default function ProposalNew({ loaderData, actionData }: Route.ComponentProps) {
+	const navigate = useNavigate();
 	const { vacationCycleId, vacation, existingProposal, googleMapsApiKey } = loaderData;
 
 	// conditional UI
@@ -426,17 +447,28 @@ export default function ProposalNew({ loaderData, actionData }: Route.ComponentP
 		}, 0);
 	}
 
+	function handleCancel() {
+		// Check if we came from within our app by checking the referrer
+		const referrer = document.referrer;
+		const currentOrigin = window.location.origin;
+
+		// If referrer is from our site, go back. Otherwise go to home.
+		if (referrer && referrer.startsWith(currentOrigin)) {
+			navigate(-1);
+		} else {
+			navigate("/");
+		}
+	}
+
 	return (
 		<Box className="proposals-new-page">
 			<VStack gap={6}>
 				{/* Page Header */}
 				<HStack gap={2} justifyContent="space-between" alignItems="center">
 					<Text font="display1">Create Proposal</Text>
-					<Link to="/">
-						<Button variant="secondary" compact>
-							Cancel
-						</Button>
-					</Link>
+					<Button variant="secondary" compact onClick={handleCancel}>
+						Cancel
+					</Button>
 				</HStack>
 
 				{/* Vacation Context Banner (if applicable) */}

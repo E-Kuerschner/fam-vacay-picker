@@ -1,6 +1,6 @@
 import type { Route } from "./+types/route";
 import { Link } from "react-router";
-import { VStack, Box } from "@coinbase/cds-web/layout";
+import { VStack, HStack, Box } from "@coinbase/cds-web/layout";
 import { Text } from "@coinbase/cds-web/typography/Text";
 
 type VacationListProps = {
@@ -18,9 +18,10 @@ export function VacationList({ vacations }: VacationListProps) {
 					{vacations.map((vacation) => (
 						<Box key={vacation.id} className="vacation-link">
 							<Link to={`/vacation/${vacation.id}`}>
-								<Text>
-									{vacation.year} - {vacation.status}
-								</Text>
+								<HStack gap={2} alignItems="center">
+									{/* the final vacation date should be set for "past" vacations, but technically could be null */}
+									<Text>{vacation.vacationDate?.toString() ?? vacation.year}</Text>
+								</HStack>
 							</Link>
 						</Box>
 					))}

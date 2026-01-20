@@ -15,7 +15,8 @@
 		"db:generate": "bun x @better-auth/cli generate --yes --output ./database/authSchema.ts && bun --bun --env-file=.dev.vars drizzle-kit --config database/drizzle.config.ts generate",
 		"db:migrate": "bun --bun --env-file=.dev.vars drizzle-kit --config database/drizzle.config.ts migrate",
 		"db:migrate:local": "wrangler d1 migrations apply fam-vacay-picker --local",
-		"db:reset:local": "rm -rf .wrangler/state/v3/d1 && bun run db:migrate:local"
+		"db:reset:local": "rm -rf .wrangler/state/v3/d1 && bun run db:migrate:local",
+		"seed": "bun database/scripts/seed/seedScenario.ts"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.71.2",
