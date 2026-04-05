@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "cds-code": {
+      "source": "coinbase/cds",
+      "sourceType": "github",
+      "computedHash": "8f7728a6a6a05ea89eb1930db735050d485501676659808b935533b732f894d2"
+    }
+  }
+}
